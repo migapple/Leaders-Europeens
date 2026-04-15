@@ -1,0 +1,1567 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Leaders Européens</title>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0a0810;
+    --ink2: #13101e;
+    --gold: #c9a84c;
+    --gold2: #e8c97a;
+    --cream: #f0e8d0;
+    --cream2: #d8ceb0;
+    --muted: #6a6080;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--ink);
+    color: var(--cream);
+    font-family: 'Cormorant Garamond', serif;
+    overflow: hidden;
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  #app {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    padding-top: var(--safe-top);
+    background: var(--ink);
+  }
+
+  /* ── HEADER ── */
+  header {
+    flex-shrink: 0;
+    padding: 14px 18px 10px;
+    border-bottom: 1px solid rgba(201,168,76,0.25);
+    background: var(--ink);
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .app-title {
+    font-family: 'IM Fell English', serif;
+    font-size: 1.25rem;
+    color: var(--gold2);
+    line-height: 1.1;
+    letter-spacing: 0.01em;
+  }
+
+  .app-subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 1px;
+  }
+
+  .lang-toggle {
+    display: flex;
+    border: 1px solid rgba(201,168,76,0.4);
+    border-radius: 4px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .lang-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .lang-btn.active {
+    background: rgba(201,168,76,0.18);
+    color: var(--gold2);
+  }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+  }
+
+  .tab {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: 'IM Fell English', serif;
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    padding: 9px 4px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.25s;
+    position: relative;
+    top: 1px;
+  }
+
+  .tab.active {
+    color: var(--gold2);
+    border-bottom-color: var(--gold);
+  }
+
+  /* ── FILTERS ── */
+  .filters-wrap {
+    flex-shrink: 0;
+    padding: 8px 14px;
+    border-bottom: 1px solid rgba(201,168,76,0.12);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .filters-wrap::-webkit-scrollbar { display: none; }
+
+  .filters {
+    display: flex;
+    gap: 7px;
+    width: max-content;
+  }
+
+  .filter-btn {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 20px;
+    color: var(--cream2);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    padding: 4px 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+
+  .filter-btn.active {
+    background: rgba(201,168,76,0.2);
+    border-color: var(--gold);
+    color: var(--gold2);
+  }
+
+  /* ── LISTE ── */
+  #tab-liste {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 10px 14px 20px;
+    scrollbar-width: none;
+  }
+
+  #tab-liste::-webkit-scrollbar { display: none; }
+
+  .leader-card {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 11px 12px;
+    margin-bottom: 7px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(201,168,76,0.12);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .leader-card:active { background: rgba(201,168,76,0.08); }
+
+  .leader-portrait {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(201,168,76,0.3);
+    object-fit: cover;
+    background: var(--ink2);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    overflow: hidden;
+  }
+
+  .leader-portrait img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+
+  .leader-info { flex: 1; min-width: 0; }
+
+  .leader-name {
+    font-family: 'IM Fell English', serif;
+    font-size: 0.97rem;
+    color: var(--cream);
+    line-height: 1.2;
+  }
+
+  .leader-role {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .leader-dates {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.73rem;
+    color: rgba(201,168,76,0.7);
+    margin-top: 1px;
+  }
+
+  .leader-flag {
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+
+  /* ── DETAIL ── */
+  #panel-detail {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--ink);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
+    padding-top: var(--safe-top);
+  }
+
+  #panel-detail.open { transform: translateX(0); }
+
+  .detail-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+    flex-shrink: 0;
+  }
+
+  .back-btn {
+    background: none;
+    border: none;
+    color: var(--gold);
+    font-size: 1.4rem;
+    cursor: pointer;
+    padding: 4px 8px 4px 0;
+    line-height: 1;
+  }
+
+  .detail-scroll {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 0 40px;
+    scrollbar-width: none;
+  }
+
+  .detail-scroll::-webkit-scrollbar { display: none; }
+
+  .detail-portrait-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 20px 18px;
+    border-bottom: 1px solid rgba(201,168,76,0.12);
+    background: linear-gradient(180deg, rgba(201,168,76,0.04) 0%, transparent 100%);
+  }
+
+  .detail-portrait {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    border: 2px solid rgba(201,168,76,0.4);
+    object-fit: cover;
+    background: var(--ink2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    overflow: hidden;
+    margin-bottom: 14px;
+  }
+
+  .detail-portrait img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+
+  .detail-flag { font-size: 2rem; margin-bottom: 4px; }
+
+  .detail-name {
+    font-family: 'IM Fell English', serif;
+    font-size: 1.45rem;
+    color: var(--gold2);
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  .detail-role-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 0.88rem;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 4px;
+  }
+
+  .detail-dates-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.82rem;
+    color: rgba(201,168,76,0.8);
+    text-align: center;
+    margin-top: 3px;
+    letter-spacing: 0.04em;
+  }
+
+  .detail-body { padding: 18px 20px; }
+
+  .detail-section {
+    margin-bottom: 18px;
+  }
+
+  .detail-section-title {
+    font-family: 'IM Fell English', serif;
+    font-size: 0.78rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+    padding-bottom: 5px;
+    margin-bottom: 9px;
+  }
+
+  .detail-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.95rem;
+    color: var(--cream2);
+    line-height: 1.65;
+  }
+
+  .detail-badge {
+    display: inline-block;
+    background: rgba(201,168,76,0.12);
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 4px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.75rem;
+    color: var(--gold2);
+    padding: 3px 10px;
+    margin: 3px 3px 0 0;
+  }
+
+  /* ── QUIZ ── */
+  #tab-quiz {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 16px 16px 30px;
+    scrollbar-width: none;
+  }
+
+  #tab-quiz::-webkit-scrollbar { display: none; }
+
+  .quiz-score-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: rgba(201,168,76,0.06);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 8px;
+    margin-bottom: 16px;
+  }
+
+  .quiz-score-label {
+    font-family: 'IM Fell English', serif;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+
+  .quiz-score-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    color: var(--gold2);
+    font-weight: 600;
+  }
+
+  .quiz-question-box {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(201,168,76,0.18);
+    border-radius: 10px;
+    padding: 20px 16px;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+
+  .quiz-q-portrait {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px solid rgba(201,168,76,0.35);
+    margin: 0 auto 12px;
+    background: var(--ink2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    overflow: hidden;
+  }
+
+  .quiz-q-portrait img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+
+  .quiz-question-text {
+    font-family: 'IM Fell English', serif;
+    font-size: 1rem;
+    color: var(--cream);
+    line-height: 1.4;
+  }
+
+  .quiz-answers {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    margin-bottom: 16px;
+  }
+
+  .quiz-answer-btn {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 8px;
+    color: var(--cream);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.92rem;
+    padding: 12px 16px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+    line-height: 1.3;
+  }
+
+  .quiz-answer-btn.correct {
+    background: rgba(80,180,80,0.15);
+    border-color: rgba(80,200,80,0.5);
+    color: #90e890;
+  }
+
+  .quiz-answer-btn.wrong {
+    background: rgba(200,60,60,0.15);
+    border-color: rgba(220,80,80,0.5);
+    color: #e88080;
+  }
+
+  .quiz-answer-btn:disabled { cursor: default; }
+
+  .quiz-next-btn {
+    width: 100%;
+    background: rgba(201,168,76,0.14);
+    border: 1px solid rgba(201,168,76,0.4);
+    border-radius: 8px;
+    color: var(--gold2);
+    font-family: 'IM Fell English', serif;
+    font-size: 0.95rem;
+    letter-spacing: 0.03em;
+    padding: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .quiz-next-btn:active { background: rgba(201,168,76,0.25); }
+
+  .quiz-result-box {
+    text-align: center;
+    padding: 30px 20px;
+  }
+
+  .quiz-result-score {
+    font-family: 'IM Fell English', serif;
+    font-size: 3rem;
+    color: var(--gold2);
+  }
+
+  .quiz-result-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  .quiz-restart-btn {
+    margin-top: 20px;
+    background: rgba(201,168,76,0.14);
+    border: 1px solid rgba(201,168,76,0.4);
+    border-radius: 8px;
+    color: var(--gold2);
+    font-family: 'IM Fell English', serif;
+    font-size: 0.95rem;
+    padding: 13px 30px;
+    cursor: pointer;
+  }
+
+  /* ── HIDDEN ── */
+  .hidden { display: none !important; }
+
+  /* Loading spinner */
+  .portrait-loading {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.6rem;
+    color: var(--muted);
+  }
+
+  /* ── NOS APPS ── */
+  #tab-apps {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 16px 16px 40px;
+    scrollbar-width: none;
+  }
+  #tab-apps::-webkit-scrollbar { display: none; }
+
+  .apps-intro {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 0.82rem;
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 16px;
+    letter-spacing: 0.04em;
+  }
+
+  .app-item {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 11px 13px;
+    margin-bottom: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(201,168,76,0.14);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .app-item:active { background: rgba(201,168,76,0.1); }
+
+  .app-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    background: var(--ink2);
+    border: 1px solid rgba(201,168,76,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .app-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+  }
+
+  .app-info { flex: 1; min-width: 0; }
+
+  .app-name {
+    font-family: 'IM Fell English', serif;
+    font-size: 0.92rem;
+    color: var(--cream);
+    line-height: 1.2;
+  }
+
+  .app-desc {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .app-chevron {
+    color: rgba(201,168,76,0.4);
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-top">
+      <div>
+        <div class="app-title" id="h-title">Leaders Européens</div>
+        <div class="app-subtitle" id="h-subtitle">XXe Siècle · 42 figures</div>
+      </div>
+      <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang('fr')">FR</button>
+        <button class="lang-btn" onclick="setLang('en')">EN</button>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" id="tab-btn-liste" onclick="showTab('liste')">
+        <span id="t-liste">Figures</span>
+      </button>
+      <button class="tab" id="tab-btn-quiz" onclick="showTab('quiz')">Quiz</button>
+      <button class="tab" id="tab-btn-apps" onclick="showTab('apps')" id="t-apps">Nos Apps</button>
+    </div>
+  </header>
+
+  <!-- FILTERS -->
+  <div class="filters-wrap" id="filters-wrap">
+    <div class="filters" id="filters-container"></div>
+  </div>
+
+  <!-- LISTE -->
+  <div id="tab-liste"></div>
+
+  <!-- QUIZ -->
+  <div id="tab-quiz" class="hidden"></div>
+
+  <!-- NOS APPS -->
+  <div id="tab-apps" class="hidden"></div>
+
+  <!-- DETAIL PANEL -->
+  <div id="panel-detail">
+    <div class="detail-header">
+      <button class="back-btn" onclick="closeDetail()">‹</button>
+      <span id="detail-header-name" style="font-family:'IM Fell English',serif;font-size:1rem;color:var(--gold2)"></span>
+    </div>
+    <div class="detail-scroll">
+      <div class="detail-portrait-wrap">
+        <div class="detail-flag" id="detail-flag"></div>
+        <div class="detail-portrait" id="detail-portrait-big"></div>
+        <div class="detail-name" id="detail-name"></div>
+        <div class="detail-role-text" id="detail-role"></div>
+        <div class="detail-dates-text" id="detail-dates"></div>
+      </div>
+      <div class="detail-body">
+        <div class="detail-section">
+          <div class="detail-section-title" id="ds-bio">Biographie</div>
+          <div class="detail-text" id="detail-bio"></div>
+        </div>
+        <div class="detail-section">
+          <div class="detail-section-title" id="ds-legacy">Héritage</div>
+          <div class="detail-text" id="detail-legacy"></div>
+        </div>
+        <div class="detail-section">
+          <div class="detail-section-title" id="ds-tags">Catégories</div>
+          <div id="detail-tags"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ────────────────────────────────────────────────
+// DATA
+// ────────────────────────────────────────────────
+const DATA = [
+  // FRANCE
+  { id:1, flag:'🇫🇷', country:'France', countryEn:'France',
+    name:'Georges Clemenceau', dates:'1841–1929', period:'1906–1920',
+    role:{fr:'Président du Conseil', en:'Prime Minister'},
+    tags:['Démocrate','Guerre 14-18'],
+    wiki:'Georges_Clemenceau',
+    bio:{fr:"Surnommé « le Tigre », Clemenceau incarna la résistance française durant la Première Guerre mondiale. Républicain intransigeant, il fut l'un des artisans de la victoire de 1918 et négocia le Traité de Versailles.", en:"Known as 'The Tiger', Clemenceau embodied French resistance during the First World War. An uncompromising republican, he was one of the architects of the 1918 victory and negotiated the Treaty of Versailles."},
+    legacy:{fr:"Figure tutélaire de la IIIe République, son acharnement à vaincre reste un symbole de la détermination nationale française.", en:"A towering figure of the Third Republic, his determination to win remains a symbol of French national resolve."}
+  },
+  { id:2, flag:'🇫🇷', country:'France', countryEn:'France',
+    name:'Léon Blum', dates:'1872–1950', period:'1936–1938',
+    role:{fr:'Président du Conseil', en:'Prime Minister'},
+    tags:['Socialiste','Front Populaire'],
+    wiki:'Léon_Blum',
+    bio:{fr:"Premier chef de gouvernement socialiste de France, Léon Blum dirigea le Front Populaire. Son gouvernement instaura les congés payés, la semaine de 40 heures et les conventions collectives.", en:"France's first socialist Prime Minister, Léon Blum led the Popular Front. His government introduced paid holidays, the 40-hour working week and collective bargaining agreements."},
+    legacy:{fr:"Son œuvre sociale de 1936 reste fondatrice pour les droits des travailleurs français. Figure morale de la résistance à l'antisémitisme et au nazisme.", en:"His 1936 social reforms remain foundational for French workers' rights. A moral icon of resistance to antisemitism and Nazism."}
+  },
+  { id:3, flag:'🇫🇷', country:'France', countryEn:'France',
+    name:'Philippe Pétain', dates:'1856–1951', period:'1940–1944',
+    role:{fr:'Chef de l\'État français', en:'Head of State (Vichy France)'},
+    tags:['Autoritaire','Collaboration'],
+    wiki:'Philippe_Pétain',
+    bio:{fr:"Héros de Verdun en 1916, Pétain devint chef de l'État français après la défaite de juin 1940 et instaura le régime de Vichy. Il engagea la France dans la collaboration avec l'Allemagne nazie.", en:"Hero of Verdun in 1916, Pétain became head of the French State after the June 1940 defeat and established the Vichy regime. He committed France to collaboration with Nazi Germany."},
+    legacy:{fr:"Symbole ambigu : héros de la Grande Guerre et artisan de la collaboration. Condamné à mort en 1945, sa peine fut commuée en détention à vie.", en:"An ambiguous symbol: hero of the Great War and architect of collaboration. Sentenced to death in 1945, his sentence was commuted to life imprisonment."}
+  },
+  { id:4, flag:'🇫🇷', country:'France', countryEn:'France',
+    name:'Charles de Gaulle', dates:'1890–1970', period:'1944–1969',
+    role:{fr:'Président de la République', en:'President of the Republic'},
+    tags:['Démocrate','Résistant','Fondateur'],
+    wiki:'Charles_de_Gaulle',
+    bio:{fr:"Fondateur de la France Libre en 1940, de Gaulle libéra la France et présida deux fois son destin : à la Libération, puis comme premier président de la Ve République qu'il créa en 1958.", en:"Founder of Free France in 1940, de Gaulle liberated France and guided its destiny twice: at the Liberation and then as the first President of the Fifth Republic he created in 1958."},
+    legacy:{fr:"Figure tutélaire du XXe siècle français. La Ve République, la force de dissuasion nucléaire et l'indépendance diplomatique française lui doivent leur existence.", en:"The defining figure of 20th-century France. The Fifth Republic, France's nuclear deterrent, and its diplomatic independence all owe their existence to him."}
+  },
+  { id:5, flag:'🇫🇷', country:'France', countryEn:'France',
+    name:'Georges Pompidou', dates:'1911–1974', period:'1962–1974',
+    role:{fr:'Président de la République', en:'President of the Republic'},
+    tags:['Gaulliste','Modernisation'],
+    wiki:'Georges_Pompidou',
+    bio:{fr:"Premier ministre puis président, Pompidou modernisa la France industrielle et engagea une politique de grands travaux. Fin lettré et mécène, il porta le projet du Centre Beaubourg.", en:"Prime Minister then President, Pompidou modernised industrial France and launched major infrastructure projects. A cultured man and patron of the arts, he championed the Centre Pompidou project."},
+    legacy:{fr:"Artisan de la modernisation économique française et de la réconciliation franco-britannique, avec l'entrée du Royaume-Uni dans la CEE en 1973.", en:"Architect of French economic modernisation and Franco-British reconciliation, with the UK joining the EEC in 1973."}
+  },
+  { id:6, flag:'🇫🇷', country:'France', countryEn:'France',
+    name:'François Mitterrand', dates:'1916–1996', period:'1981–1995',
+    role:{fr:'Président de la République', en:'President of the Republic'},
+    tags:['Socialiste','Réformateur'],
+    wiki:'François_Mitterrand',
+    bio:{fr:"Premier président socialiste de la Ve République, Mitterrand abolit la peine de mort, nationalisa de grandes entreprises et impulsa la construction européenne avec Helmut Kohl.", en:"First Socialist President of the Fifth Republic, Mitterrand abolished the death penalty, nationalised major companies and drove European integration forward alongside Helmut Kohl."},
+    legacy:{fr:"Son bilan mêle grandes réformes sociales, grands travaux (Louvre, Opéra Bastille) et zones d'ombre comme son passé vichyste. Artisan du traité de Maastricht.", en:"His legacy blends major social reforms, grands travaux (the Louvre, Opéra Bastille) and shadows including his Vichy past. Architect of the Maastricht Treaty."}
+  },
+  // UK
+  { id:7, flag:'🇬🇧', country:'Royaume-Uni', countryEn:'United Kingdom',
+    name:'David Lloyd George', dates:'1863–1945', period:'1916–1922',
+    role:{fr:'Premier ministre', en:'Prime Minister'},
+    tags:['Démocrate','Guerre 14-18'],
+    wiki:'David_Lloyd_George',
+    bio:{fr:"Premier ministre libéral qui mena le Royaume-Uni à la victoire en 1918, Lloyd George fut aussi l'artisan de réformes sociales majeures avant-guerre et l'un des négociateurs de Versailles.", en:"Liberal Prime Minister who led Britain to victory in 1918, Lloyd George was also the architect of major pre-war social reforms and one of the key negotiators at Versailles."},
+    legacy:{fr:"Dernier grand premier ministre libéral britannique. Son action réformatrice posa les bases de l'État-providence britannique.", en:"The last great Liberal Prime Minister of Britain. His reforming work laid the foundations of the British welfare state."}
+  },
+  { id:8, flag:'🇬🇧', country:'Royaume-Uni', countryEn:'United Kingdom',
+    name:'Winston Churchill', dates:'1874–1965', period:'1940–1955',
+    role:{fr:'Premier ministre', en:'Prime Minister'},
+    tags:['Démocrate','Guerre 39-45','Résistant'],
+    wiki:'Winston_Churchill',
+    bio:{fr:"Churchill devint Premier ministre en mai 1940 au moment le plus sombre pour le Royaume-Uni. Ses discours légendaires et sa ténacité galvanisèrent les Alliés contre Hitler. Prix Nobel de Littérature en 1953.", en:"Churchill became Prime Minister in May 1940 at Britain's darkest hour. His legendary speeches and tenacity galvanised the Allies against Hitler. Nobel Prize for Literature in 1953."},
+    legacy:{fr:"Symbole mondial de la résistance au fascisme. Sa vision de l'Europe unie et de la relation spéciale anglo-américaine façonnèrent l'ordre d'après-guerre.", en:"A global symbol of resistance to fascism. His vision of a united Europe and the Anglo-American special relationship shaped the post-war order."}
+  },
+  { id:9, flag:'🇬🇧', country:'Royaume-Uni', countryEn:'United Kingdom',
+    name:'Clement Attlee', dates:'1883–1967', period:'1945–1951',
+    role:{fr:'Premier ministre', en:'Prime Minister'},
+    tags:['Socialiste','Réformateur'],
+    wiki:'Clement_Attlee',
+    bio:{fr:"Successeur de Churchill en 1945, Attlee créa le National Health Service et l'État-providence britannique, tout en menant la décolonisation de l'Inde et du Pakistan.", en:"Churchill's successor in 1945, Attlee created the National Health Service and the British welfare state, while overseeing the decolonisation of India and Pakistan."},
+    legacy:{fr:"Considéré par de nombreux historiens comme le plus grand Premier ministre britannique du XXe siècle pour l'ampleur de ses réformes sociales.", en:"Considered by many historians as the greatest British Prime Minister of the 20th century for the breadth of his social reforms."}
+  },
+  { id:10, flag:'🇬🇧', country:'Royaume-Uni', countryEn:'United Kingdom',
+    name:'Margaret Thatcher', dates:'1925–2013', period:'1979–1990',
+    role:{fr:'Premier ministre', en:'Prime Minister'},
+    tags:['Conservateur','Réformateur'],
+    wiki:'Margaret_Thatcher',
+    bio:{fr:"Première femme Premier ministre du Royaume-Uni, Thatcher transforma l'économie britannique par sa politique néo-libérale : privatisations, lutte contre les syndicats, dérégulation financière.", en:"Britain's first female Prime Minister, Thatcher transformed the British economy through neo-liberal policies: privatisations, union confrontation, and financial deregulation."},
+    legacy:{fr:"La « Dame de Fer » divise encore : transformatrice pour ses partisans, destructrice du tissu social pour ses adversaires. Son influence sur le conservatisme mondial fut immense.", en:"The 'Iron Lady' remains divisive: transformative for supporters, destructive of the social fabric for opponents. Her influence on global conservatism was immense."}
+  },
+  { id:11, flag:'🇬🇧', country:'Royaume-Uni', countryEn:'United Kingdom',
+    name:'Tony Blair', dates:'1953–', period:'1997–2007',
+    role:{fr:'Premier ministre', en:'Prime Minister'},
+    tags:['Réformateur','Travailliste'],
+    wiki:'Tony_Blair',
+    bio:{fr:"Blair renouvela le Parti Travailliste avec le « New Labour » et remporta trois élections consécutives. Son bilan intérieur (Good Friday Agreement, devolution) est terni par la guerre en Irak.", en:"Blair renewed the Labour Party with 'New Labour' and won three consecutive elections. His domestic record (Good Friday Agreement, devolution) is overshadowed by the Iraq War."},
+    legacy:{fr:"Artisan de la paix en Irlande du Nord et réformateur social, mais durablement associé à la guerre d'Irak de 2003 et à ses conséquences.", en:"Architect of peace in Northern Ireland and social reformer, but durably associated with the 2003 Iraq War and its consequences."}
+  },
+  // ALLEMAGNE
+  { id:12, flag:'🇩🇪', country:'Allemagne', countryEn:'Germany',
+    name:'Adolf Hitler', dates:'1889–1945', period:'1933–1945',
+    role:{fr:'Chancelier / Führer', en:'Chancellor / Führer'},
+    tags:['Autoritaire','Totalitaire'],
+    wiki:'Adolf_Hitler',
+    bio:{fr:"Dictateur du IIIe Reich, Hitler instaura un régime totalitaire fondé sur la terreur, la persécution raciale et l'expansionnisme. Il déclencha la Seconde Guerre mondiale et ordonna la Shoah, génocide de six millions de Juifs.", en:"Dictator of the Third Reich, Hitler established a totalitarian regime based on terror, racial persecution and expansionism. He started the Second World War and ordered the Holocaust, the genocide of six million Jews."},
+    legacy:{fr:"Responsable de la Seconde Guerre mondiale et de la Shoah, il incarne le mal absolu du XXe siècle. Son régime et ses crimes ont irréversiblement transformé l'Europe et l'ordre mondial.", en:"Responsible for the Second World War and the Holocaust, he embodies the absolute evil of the 20th century. His regime and its crimes irreversibly transformed Europe and the world order."}
+  },
+  { id:13, flag:'🇩🇪', country:'Allemagne', countryEn:'Germany',
+    name:'Konrad Adenauer', dates:'1876–1967', period:'1949–1963',
+    role:{fr:'Chancelier fédéral', en:'Federal Chancellor'},
+    tags:['Démocrate','Fondateur','Réformateur'],
+    wiki:'Konrad_Adenauer',
+    bio:{fr:"Premier chancelier de la République fédérale d'Allemagne, Adenauer reconstruisit l'Allemagne de l'Ouest, l'ancra dans l'Alliance atlantique et réconcilia l'Allemagne avec la France.", en:"First Chancellor of the Federal Republic of Germany, Adenauer rebuilt West Germany, anchored it in the Atlantic Alliance and achieved reconciliation between Germany and France."},
+    legacy:{fr:"Père fondateur de l'Allemagne démocratique et artisan de la réconciliation franco-allemande. Le « miracle économique » allemand se construisit sous sa chancellerie.", en:"Founding father of democratic Germany and architect of Franco-German reconciliation. The German 'economic miracle' was built under his chancellorship."}
+  },
+  { id:14, flag:'🇩🇪', country:'Allemagne', countryEn:'Germany',
+    name:'Willy Brandt', dates:'1913–1992', period:'1969–1974',
+    role:{fr:'Chancelier fédéral', en:'Federal Chancellor'},
+    tags:['Socialiste','Réformateur','Résistant'],
+    wiki:'Willy_Brandt',
+    bio:{fr:"Ancien résistant au nazisme, Brandt mena l'Ostpolitik, politique de réconciliation avec l'Europe de l'Est. Son agenouillement à Varsovie en 1970 devant le monument du ghetto est resté un geste historique. Prix Nobel de la Paix.", en:"A former Nazi resistance fighter, Brandt pursued Ostpolitik, a policy of reconciliation with Eastern Europe. His kneeling in Warsaw in 1970 at the ghetto monument became a historic gesture. Nobel Peace Prize."},
+    legacy:{fr:"Son Ostpolitik ouvrit la voie à la détente et, indirectement, à la réunification allemande. Sa génuflexion à Varsovie reste un acte de repentance unique dans l'histoire politique.", en:"His Ostpolitik paved the way for détente and, indirectly, for German reunification. His Warsaw kneeling remains a unique act of political repentance in history."}
+  },
+  { id:15, flag:'🇩🇪', country:'Allemagne', countryEn:'Germany',
+    name:'Helmut Kohl', dates:'1930–2017', period:'1982–1998',
+    role:{fr:'Chancelier fédéral', en:'Federal Chancellor'},
+    tags:['Démocrate','Fondateur','Réunification'],
+    wiki:'Helmut_Kohl',
+    bio:{fr:"Chancelier le plus longtemps en poste de l'Allemagne d'après-guerre, Kohl réalisa la réunification allemande en 1990 après la chute du Mur. Il fut aussi un artisan majeur de l'Union européenne et de l'euro.", en:"The longest-serving post-war German Chancellor, Kohl achieved German reunification in 1990 after the fall of the Wall. He was also a major architect of the European Union and the euro."},
+    legacy:{fr:"Surnommé « le Chancelier de l'unité », il est avec de Gaulle et Mitterrand l'un des grands architectes de la construction européenne.", en:"Dubbed 'the Chancellor of Unity', he is, alongside de Gaulle and Mitterrand, one of the great architects of European integration."}
+  },
+  { id:16, flag:'🇩🇪', country:'Allemagne', countryEn:'Germany',
+    name:'Angela Merkel', dates:'1954–', period:'2005–2021',
+    role:{fr:'Chancelière fédérale', en:'Federal Chancellor'},
+    tags:['Démocrate','Réformateur'],
+    wiki:'Angela_Merkel',
+    bio:{fr:"Première femme chancelière allemande, Merkel dirigea l'Allemagne pendant seize ans avec pragmatisme. Elle gèra la crise financière de 2008, la crise de la zone euro, la crise des réfugiés de 2015 et la pandémie de COVID-19.", en:"Germany's first female Chancellor, Merkel led the country for sixteen years with pragmatism. She managed the 2008 financial crisis, the eurozone crisis, the 2015 refugee crisis and the COVID-19 pandemic."},
+    legacy:{fr:"Figure de stabilité en Europe, elle incarne un style de leadership discret mais efficace. Sa gestion de la crise des réfugiés a polarisé l'Europe. Chancelière la plus influente depuis Adenauer.", en:"A figure of European stability, she embodies a quiet but effective leadership style. Her handling of the refugee crisis polarised Europe. The most influential Chancellor since Adenauer."}
+  },
+  // ITALIE
+  { id:17, flag:'🇮🇹', country:'Italie', countryEn:'Italy',
+    name:'Benito Mussolini', dates:'1883–1945', period:'1922–1943',
+    role:{fr:'Président du Conseil / Duce', en:'Prime Minister / Duce'},
+    tags:['Autoritaire','Totalitaire','Fasciste'],
+    wiki:'Benito_Mussolini',
+    bio:{fr:"Fondateur du fascisme, Mussolini prit le pouvoir en 1922 après la Marche sur Rome. Il instaura une dictature, envahit l'Éthiopie et l'Albanie, et s'allia à Hitler en 1939. Il fut exécuté par des partisans en 1945.", en:"Founder of fascism, Mussolini seized power in 1922 after the March on Rome. He established a dictatorship, invaded Ethiopia and Albania, and allied with Hitler in 1939. He was executed by partisans in 1945."},
+    legacy:{fr:"Inventeur du fascisme, Mussolini inspira les mouvements totalitaires d'Europe. Son alliance avec Hitler précipita l'Italie dans la catastrophe de la Seconde Guerre mondiale.", en:"Inventor of fascism, Mussolini inspired totalitarian movements across Europe. His alliance with Hitler plunged Italy into the catastrophe of the Second World War."}
+  },
+  { id:18, flag:'🇮🇹', country:'Italie', countryEn:'Italy',
+    name:'Alcide De Gasperi', dates:'1881–1954', period:'1945–1953',
+    role:{fr:'Président du Conseil', en:'Prime Minister'},
+    tags:['Démocrate','Fondateur','Europe'],
+    wiki:'Alcide_De_Gasperi',
+    bio:{fr:"Père de la démocratie chrétienne italienne, De Gasperi reconstruisit l'Italie après la Seconde Guerre mondiale, l'ancra dans le camp occidental et fut l'un des pères fondateurs de l'Europe communautaire.", en:"Father of Italian Christian Democracy, De Gasperi rebuilt Italy after the Second World War, anchored it in the Western bloc and was one of the founding fathers of the European Community."},
+    legacy:{fr:"Avec Adenauer et Schuman, il forme le trio fondateur de l'Europe chrétienne-démocrate. Sa résistance au fascisme et au communisme définit la démocratie italienne d'après-guerre.", en:"With Adenauer and Schuman, he forms the founding trio of Christian-democratic Europe. His resistance to fascism and communism defined post-war Italian democracy."}
+  },
+  { id:19, flag:'🇮🇹', country:'Italie', countryEn:'Italy',
+    name:'Aldo Moro', dates:'1916–1978', period:'1963–1976',
+    role:{fr:'Président du Conseil', en:'Prime Minister'},
+    tags:['Démocrate','Martyr'],
+    wiki:'Aldo_Moro',
+    bio:{fr:"Homme politique central de la démocratie chrétienne italienne, Moro tenta le « compromis historique » entre la DC et le Parti communiste. Il fut enlevé par les Brigades Rouges et assassiné en 1978.", en:"A central figure of Italian Christian Democracy, Moro attempted the 'historic compromise' between the DC and the Communist Party. He was kidnapped by the Red Brigades and murdered in 1978."},
+    legacy:{fr:"Son assassinat par les Brigades Rouges marqua le paroxysme des Années de Plomb. Il reste le symbole du sacrifice politique et du dialogue entre ennemis idéologiques.", en:"His murder by the Red Brigades marked the peak of the Years of Lead. He remains a symbol of political sacrifice and dialogue between ideological opponents."}
+  },
+  { id:20, flag:'🇮🇹', country:'Italie', countryEn:'Italy',
+    name:'Silvio Berlusconi', dates:'1936–2023', period:'1994–2011',
+    role:{fr:'Président du Conseil', en:'Prime Minister'},
+    tags:['Conservateur','Populiste'],
+    wiki:'Silvio_Berlusconi',
+    bio:{fr:"Magnat des médias devenu homme politique, Berlusconi domina la vie politique italienne pendant vingt ans. Son empire médiatique, ses démêlés judiciaires et son style populiste ont redéfini la politique en Italie.", en:"A media mogul turned politician, Berlusconi dominated Italian political life for twenty years. His media empire, legal troubles and populist style redefined Italian politics."},
+    legacy:{fr:"Précurseur du populisme médiatique européen, il a durablement brouillé la frontière entre pouvoir politique et pouvoir médiatique en Italie.", en:"A forerunner of European media populism, he permanently blurred the boundary between political and media power in Italy."}
+  },
+  // ESPAGNE
+  { id:21, flag:'🇪🇸', country:'Espagne', countryEn:'Spain',
+    name:'Francisco Franco', dates:'1892–1975', period:'1939–1975',
+    role:{fr:'Chef de l\'État', en:'Head of State'},
+    tags:['Autoritaire','Franquisme'],
+    wiki:'Francisco_Franco',
+    bio:{fr:"Franco prit le pouvoir après sa victoire dans la Guerre civile espagnole (1936-1939). Il dirigea l'Espagne d'une main de fer pendant 36 ans, maintenant la neutralité pendant la Seconde Guerre mondiale.", en:"Franco seized power after his victory in the Spanish Civil War (1936-1939). He ruled Spain with an iron fist for 36 years, maintaining neutrality during the Second World War."},
+    legacy:{fr:"Sa dictature laissa des cicatrices profondes dans la société espagnole. Paradoxalement, l'Espagne franchit la transition démocratique sans rupture violente après sa mort en 1975.", en:"His dictatorship left deep scars in Spanish society. Paradoxically, Spain achieved a peaceful democratic transition after his death in 1975."}
+  },
+  { id:22, flag:'🇪🇸', country:'Espagne', countryEn:'Spain',
+    name:'Adolfo Suárez', dates:'1932–2014', period:'1976–1981',
+    role:{fr:'Président du gouvernement', en:'Prime Minister'},
+    tags:['Démocrate','Transition','Réformateur'],
+    wiki:'Adolfo_Suárez',
+    bio:{fr:"Ancien apparatchik du régime franquiste, Suárez fut le principal artisan de la transition démocratique espagnole. Il légalisa les partis politiques, organisa les premières élections libres et négocia la Constitution de 1978.", en:"A former Francoist apparatchik, Suárez was the main architect of Spain's democratic transition. He legalised political parties, organised the first free elections and negotiated the 1978 Constitution."},
+    legacy:{fr:"Figure emblématique de la Transición, il réussit le passage d'une dictature à une démocratie sans bain de sang, modèle étudié dans le monde entier.", en:"An iconic figure of the Transición, he achieved the passage from dictatorship to democracy without bloodshed, a model studied worldwide."}
+  },
+  { id:23, flag:'🇪🇸', country:'Espagne', countryEn:'Spain',
+    name:'Felipe González', dates:'1942–', period:'1982–1996',
+    role:{fr:'Président du gouvernement', en:'Prime Minister'},
+    tags:['Socialiste','Réformateur','Europe'],
+    wiki:'Felipe_González',
+    bio:{fr:"Dirigeant du PSOE, González gouverna l'Espagne pendant 14 ans, modernisant le pays, l'intégrant dans l'OTAN et dans la CEE (1986). Son mandat vit aussi les Jeux olympiques de Barcelone et l'Expo de Séville (1992).", en:"Leader of the PSOE, González governed Spain for 14 years, modernising the country and integrating it into NATO and the EEC (1986). His tenure saw the Barcelona Olympics and the Seville World Expo (1992)."},
+    legacy:{fr:"Artisan de la modernisation économique et européenne de l'Espagne. Son bilan fut terni par des scandales de corruption et l'affaire GAL.", en:"Architect of Spain's economic and European modernisation. His record was tarnished by corruption scandals and the GAL affair."}
+  },
+  // URSS / RUSSIE
+  { id:24, flag:'🇷🇺', country:'Russie / URSS', countryEn:'Russia / USSR',
+    name:'Vladimir Lénine', dates:'1870–1924', period:'1917–1924',
+    role:{fr:'Chef du gouvernement soviétique', en:'Head of Soviet Government'},
+    tags:['Révolutionnaire','Communiste','Totalitaire'],
+    wiki:'Vladimir_Lenin',
+    bio:{fr:"Théoricien marxiste et révolutionnaire, Lénine dirigea la Révolution russe d'octobre 1917, renversa le gouvernement provisoire et fonda l'Union soviétique. Il instaura la dictature du prolétariat.", en:"Marxist theorist and revolutionary, Lenin led the October Revolution of 1917, overthrew the Provisional Government and founded the Soviet Union. He established the dictatorship of the proletariat."},
+    legacy:{fr:"Fondateur de l'URSS et du mouvement communiste mondial. Son idéologie et son modèle politique influencèrent la moitié de la planète au XXe siècle.", en:"Founder of the USSR and the world communist movement. His ideology and political model influenced half the planet in the 20th century."}
+  },
+  { id:25, flag:'🇷🇺', country:'Russie / URSS', countryEn:'Russia / USSR',
+    name:'Joseph Staline', dates:'1878–1953', period:'1924–1953',
+    role:{fr:'Secrétaire général', en:'General Secretary'},
+    tags:['Autoritaire','Totalitaire','Communiste'],
+    wiki:'Joseph_Stalin',
+    bio:{fr:"Successeur de Lénine, Staline instaura un régime de terreur de masse (Goulag, Grande Terreur). Il industrialisa l'URSS de force, résista à Hitler (opération Barbarossa) et étendit la sphère soviétique en Europe de l'Est.", en:"Lenin's successor, Stalin established a regime of mass terror (Gulag, Great Terror). He forcibly industrialised the USSR, resisted Hitler (Operation Barbarossa) and extended Soviet influence across Eastern Europe."},
+    legacy:{fr:"Responsable de millions de morts par la famine, les purges et le Goulag. Sa victoire sur Hitler lui conféra un prestige immense qui perdure en Russie, malgré ses crimes.", en:"Responsible for millions of deaths through famine, purges and the Gulag. His victory over Hitler gave him immense prestige that persists in Russia today, despite his crimes."}
+  },
+  { id:26, flag:'🇷🇺', country:'Russie / URSS', countryEn:'Russia / USSR',
+    name:'Nikita Khrouchtchev', dates:'1894–1971', period:'1953–1964',
+    role:{fr:'Premier secrétaire', en:'First Secretary'},
+    tags:['Communiste','Réformateur','Guerre Froide'],
+    wiki:'Nikita_Khrushchev',
+    bio:{fr:"Successeur de Staline, Khrouchtchev lança la « déstalinisation » et la politique du dégel. Il affronta Kennedy lors de la crise des missiles de Cuba (1962) et lança la conquête spatiale soviétique.", en:"Stalin's successor, Khrushchev launched 'de-Stalinisation' and the Thaw policy. He faced Kennedy during the Cuban Missile Crisis (1962) and launched the Soviet space programme."},
+    legacy:{fr:"Sa dénonciation des crimes de Staline fut un tournant de l'histoire soviétique. La crise de Cuba reste le moment le plus dangereux de la Guerre froide.", en:"His denunciation of Stalin's crimes was a turning point in Soviet history. The Cuba crisis remains the most dangerous moment of the Cold War."}
+  },
+  { id:27, flag:'🇷🇺', country:'Russie / URSS', countryEn:'Russia / USSR',
+    name:'Léonid Brejnev', dates:'1906–1982', period:'1964–1982',
+    role:{fr:'Secrétaire général', en:'General Secretary'},
+    tags:['Communiste','Guerre Froide'],
+    wiki:'Leonid_Brezhnev',
+    bio:{fr:"Dirigeant soviétique pendant 18 ans, Brejnev énonça la doctrine de souveraineté limitée (doctrine Brejnev), intervint en Tchécoslovaquie (1968) et en Afghanistan (1979), tout en négociant la détente avec l'Occident.", en:"Soviet leader for 18 years, Brezhnev enunciated the doctrine of limited sovereignty (Brezhnev Doctrine), intervened in Czechoslovakia (1968) and Afghanistan (1979), while negotiating détente with the West."},
+    legacy:{fr:"Son règne synonyme de stagnation économique et de corruption prépara le terrain pour les crises qui conduisirent à l'effondrement de l'URSS.", en:"His rule, synonymous with economic stagnation and corruption, prepared the ground for the crises that led to the USSR's collapse."}
+  },
+  { id:28, flag:'🇷🇺', country:'Russie / URSS', countryEn:'Russia / USSR',
+    name:'Mikhaïl Gorbatchev', dates:'1931–2022', period:'1985–1991',
+    role:{fr:'Secrétaire général / Président', en:'General Secretary / President'},
+    tags:['Réformateur','Communiste'],
+    wiki:'Mikhail_Gorbachev',
+    bio:{fr:"Dernier dirigeant de l'URSS, Gorbatchev lança la glasnost (transparence) et la perestroïka (restructuration). Ses réformes, involontairement, précipitèrent l'effondrement de l'URSS et la fin de la Guerre froide.", en:"Last leader of the USSR, Gorbachev launched glasnost (openness) and perestroika (restructuring). His reforms unintentionally precipitated the collapse of the USSR and the end of the Cold War."},
+    legacy:{fr:"Prix Nobel de la Paix 1990, il est héros en Occident et figure controversée en Russie. Son action mit fin pacifiquement à la Guerre froide et permit la réunification allemande.", en:"1990 Nobel Peace Prize laureate, he is a hero in the West and a controversial figure in Russia. His actions peacefully ended the Cold War and enabled German reunification."}
+  },
+  { id:29, flag:'🇷🇺', country:'Russie / URSS', countryEn:'Russia / USSR',
+    name:'Boris Eltsine', dates:'1931–2007', period:'1991–1999',
+    role:{fr:'Président de la Fédération de Russie', en:'President of the Russian Federation'},
+    tags:['Démocrate','Transition'],
+    wiki:'Boris_Yeltsin',
+    bio:{fr:"Premier président de la Russie post-soviétique, Eltsine mena les réformes économiques de choc, résista au coup d'État de 1991 et engagea la guerre en Tchétchénie. Il désigna Poutine comme successeur en 1999.", en:"First President of post-Soviet Russia, Yeltsin led shock economic reforms, resisted the 1991 coup attempt and launched the Chechen War. He designated Putin as his successor in 1999."},
+    legacy:{fr:"Sa transition économique par choc traumatisa la société russe et engendra une oligarchie. Sa démission surprise le 31 décembre 1999 porta Poutine au pouvoir.", en:"His shock economic transition traumatised Russian society and created an oligarchy. His surprise resignation on 31 December 1999 brought Putin to power."}
+  },
+  // POLOGNE
+  { id:30, flag:'🇵🇱', country:'Pologne', countryEn:'Poland',
+    name:'Józef Piłsudski', dates:'1867–1935', period:'1918–1935',
+    role:{fr:'Chef de l\'État / Maréchal', en:'Head of State / Marshal'},
+    tags:['Fondateur','Nationaliste'],
+    wiki:'Józef_Piłsudski',
+    bio:{fr:"Fondateur de la Pologne indépendante en 1918 après 123 ans de partition, Piłsudski repoussa l'armée soviétique lors de la « Bataille de Varsovie » (1920), surnommée le « Miracle sur la Vistule ».", en:"Founder of independent Poland in 1918 after 123 years of partition, Piłsudski repelled the Soviet army at the 'Battle of Warsaw' (1920), dubbed the 'Miracle on the Vistula'."},
+    legacy:{fr:"Père fondateur et héros national polonais, il incarne la renaissance d'une Pologne libre. Sa victoire de 1920 stoppa l'avancée du bolchevisme vers l'Europe occidentale.", en:"Founding father and Polish national hero, he embodies the rebirth of a free Poland. His 1920 victory stopped the advance of Bolshevism towards Western Europe."}
+  },
+  { id:31, flag:'🇵🇱', country:'Pologne', countryEn:'Poland',
+    name:'Lech Wałęsa', dates:'1943–', period:'1990–1995',
+    role:{fr:'Président de la République', en:'President of the Republic'},
+    tags:['Démocrate','Résistant','Réformateur'],
+    wiki:'Lech_Wałęsa',
+    bio:{fr:"Électricien des chantiers navals de Gdańsk, Wałęsa fonda le syndicat Solidarność en 1980, premier syndicat libre du bloc soviétique. Prix Nobel de la Paix 1983, il devint le premier président démocratiquement élu de Pologne.", en:"An electrician at the Gdańsk shipyards, Wałęsa founded the Solidarity trade union in 1980, the first free union in the Soviet bloc. Nobel Peace Prize 1983, he became Poland's first democratically elected president."},
+    legacy:{fr:"Symbole mondial de la résistance au communisme, Solidarność fut le premier acte de la révolution pacifique qui s'étendit à toute l'Europe de l'Est en 1989.", en:"A global symbol of resistance to communism, Solidarity was the first act of the peaceful revolution that swept Eastern Europe in 1989."}
+  },
+  // YOUGOSLAVIE
+  { id:32, flag:'🇾🇺', country:'Yougoslavie', countryEn:'Yugoslavia',
+    name:'Josip Broz Tito', dates:'1892–1980', period:'1945–1980',
+    role:{fr:'Président à vie', en:'President for Life'},
+    tags:['Communiste','Non-aligné'],
+    wiki:'Josip_Broz_Tito',
+    bio:{fr:"Chef des partisans yougoslaves pendant la Seconde Guerre mondiale, Tito fonda la République fédérale de Yougoslavie. Il refusa la tutelle de Staline en 1948 et créa le Mouvement des non-alignés.", en:"Leader of the Yugoslav Partisans during the Second World War, Tito founded the Federal Republic of Yugoslavia. He refused Stalin's tutelage in 1948 and created the Non-Aligned Movement."},
+    legacy:{fr:"Figure unique de la Guerre froide, il maintint l'unité d'une Yougoslavie multiethnique pendant 35 ans. Sa mort en 1980 précipita les guerres des Balkans des années 1990.", en:"A unique Cold War figure, he maintained the unity of a multi-ethnic Yugoslavia for 35 years. His death in 1980 precipitated the Balkan wars of the 1990s."}
+  },
+  // SCANDINAVIE
+  { id:33, flag:'🇸🇪', country:'Suède', countryEn:'Sweden',
+    name:'Olof Palme', dates:'1927–1986', period:'1969–1986',
+    role:{fr:'Premier ministre', en:'Prime Minister'},
+    tags:['Socialiste','Réformateur'],
+    wiki:'Olof_Palme',
+    bio:{fr:"Premier ministre suédois à deux reprises, Palme fut le porte-voix du tiers-monde et un critique virulent des guerres du Vietnam et d'Irak. Il fut assassiné à Stockholm en 1986 dans des circonstances jamais élucidées.", en:"Swedish Prime Minister twice over, Palme was a spokesman for the Third World and a fierce critic of the Vietnam and Iraq wars. He was assassinated in Stockholm in 1986 in circumstances never fully resolved."},
+    legacy:{fr:"Figure majeure de la social-démocratie mondiale, son assassinat reste l'un des grands mystères politiques du XXe siècle. Il incarne le modèle nordique d'État-providence.", en:"A major figure of global social democracy, his assassination remains one of the great political mysteries of the 20th century. He embodies the Nordic welfare state model."}
+  },
+  { id:34, flag:'🇫🇮', country:'Finlande', countryEn:'Finland',
+    name:'Urho Kekkonen', dates:'1900–1986', period:'1956–1982',
+    role:{fr:'Président de la République', en:'President of the Republic'},
+    tags:['Non-aligné','Guerre Froide'],
+    wiki:'Urho_Kekkonen',
+    bio:{fr:"Président finlandais pendant 26 ans, Kekkonen maîtrisa l'équilibre délicat entre l'URSS et l'Occident — la « finlandisation » — garantissant l'indépendance de la Finlande tout en ménageant Moscou.", en:"Finnish President for 26 years, Kekkonen mastered the delicate balance between the USSR and the West — 'Finlandisation' — guaranteeing Finland's independence while keeping Moscow at bay."},
+    legacy:{fr:"La « finlandisation » qu'il incarne est devenue un concept de science politique. Sa diplomatie permit à la Finlande de survivre en tant qu'État libre à l'ombre soviétique.", en:"The 'Finlandisation' he embodies became a political science concept. His diplomacy allowed Finland to survive as a free state in the Soviet shadow."}
+  },
+  // PORTUGAL
+  { id:35, flag:'🇵🇹', country:'Portugal', countryEn:'Portugal',
+    name:'António de Oliveira Salazar', dates:'1889–1970', period:'1932–1968',
+    role:{fr:'Président du Conseil', en:'Prime Minister'},
+    tags:['Autoritaire','Corporatiste'],
+    wiki:'António_de_Oliveira_Salazar',
+    bio:{fr:"Dictateur du Portugal pendant 36 ans, Salazar instaura l'Estado Novo, régime corporatiste et catholique. Il maintint la neutralité pendant la Seconde Guerre mondiale mais s'accrocha aux colonies africaines.", en:"Dictator of Portugal for 36 years, Salazar established the Estado Novo, a corporatist and Catholic regime. He maintained neutrality during the Second World War but clung to the African colonies."},
+    legacy:{fr:"L'un des régimes autoritaires les plus durables d'Europe. La Révolution des Œillets (1974) mit fin à son héritage, faisant du Portugal une démocratie européenne.", en:"One of Europe's most enduring authoritarian regimes. The Carnation Revolution (1974) ended his legacy, making Portugal a European democracy."}
+  },
+  { id:36, flag:'🇵🇹', country:'Portugal', countryEn:'Portugal',
+    name:'Mário Soares', dates:'1924–2017', period:'1976–1996',
+    role:{fr:'Premier ministre / Président', en:'Prime Minister / President'},
+    tags:['Socialiste','Démocrate','Transition'],
+    wiki:'Mário_Soares',
+    bio:{fr:"Fondateur du Parti socialiste portugais, Soares fut le premier Premier ministre démocratique après la Révolution des Œillets, puis le premier président civil depuis des décennies. Il conduisit l'adhésion du Portugal à la CEE (1986).", en:"Founder of the Portuguese Socialist Party, Soares was the first democratic Prime Minister after the Carnation Revolution, then the first civilian President in decades. He led Portugal's accession to the EEC (1986)."},
+    legacy:{fr:"Père de la démocratie portugaise, il ancra définitivement le Portugal dans l'Europe démocratique après un demi-siècle de dictature.", en:"Father of Portuguese democracy, he definitively anchored Portugal in democratic Europe after half a century of dictatorship."}
+  },
+  // GRÈCE
+  { id:37, flag:'🇬🇷', country:'Grèce', countryEn:'Greece',
+    name:'Konstantinos Karamanlis', dates:'1907–1998', period:'1955–1980',
+    role:{fr:'Premier ministre / Président', en:'Prime Minister / President'},
+    tags:['Démocrate','Réformateur','Europe'],
+    wiki:'Konstantinos_Karamanlis',
+    bio:{fr:"Père de la démocratie grecque moderne, Karamanlis présida à la transition démocratique après la chute de la junte militaire (1974) et conduisit l'adhésion de la Grèce à la CEE (1981).", en:"Father of modern Greek democracy, Karamanlis oversaw the democratic transition after the fall of the military junta (1974) and led Greece's accession to the EEC (1981)."},
+    legacy:{fr:"Son retour d'exil en 1974 permit une transition pacifique. L'entrée de la Grèce dans l'Europe communautaire est son legs le plus durable.", en:"His return from exile in 1974 enabled a peaceful transition. Greece's entry into the European Community is his most enduring legacy."}
+  },
+  // TURQUIE
+  { id:38, flag:'🇹🇷', country:'Turquie', countryEn:'Turkey',
+    name:'Mustafa Kemal Atatürk', dates:'1881–1938', period:'1923–1938',
+    role:{fr:'Président de la République', en:'President of the Republic'},
+    tags:['Fondateur','Réformateur','Nationaliste'],
+    wiki:'Mustafa_Kemal_Atatürk',
+    bio:{fr:"Fondateur et premier président de la République de Turquie, Atatürk transforma radicalement la société turque : laïcisation, alphabet latin, droits des femmes, modernisation économique. Son surnom « Atatürk » signifie « Père des Turcs ».", en:"Founder and first President of the Turkish Republic, Atatürk radically transformed Turkish society: secularisation, Latin alphabet, women's rights, economic modernisation. His surname 'Atatürk' means 'Father of the Turks'."},
+    legacy:{fr:"L'une des transformations nationales les plus radicales du XXe siècle. Son modèle laïc influence encore la Turquie contemporaine, malgré les tensions actuelles.", en:"One of the most radical national transformations of the 20th century. His secular model still influences contemporary Turkey, despite current tensions."}
+  },
+  // EUROPE CENTRALE
+  { id:39, flag:'🇨🇿', country:'Tchécoslovaquie', countryEn:'Czechoslovakia',
+    name:'Tomáš Masaryk', dates:'1850–1937', period:'1918–1935',
+    role:{fr:'Président de la République', en:'President of the Republic'},
+    tags:['Démocrate','Fondateur'],
+    wiki:'Tomáš_Garrigue_Masaryk',
+    bio:{fr:"Philosophe et homme d'État, Masaryk fonda la Tchécoslovaquie en 1918 et la présida jusqu'en 1935. Il construisit l'une des seules démocraties libérales stables d'Europe centrale entre les deux guerres.", en:"Philosopher and statesman, Masaryk founded Czechoslovakia in 1918 and presided over it until 1935. He built one of the only stable liberal democracies in interwar Central Europe."},
+    legacy:{fr:"Figure morale et intellectuelle d'une Europe centrale démocratique. Sa Tchécoslovaquie fut un modèle de coexistence ethnique et de démocratie libérale, annihilé par Munich en 1938.", en:"Moral and intellectual figure of a democratic Central Europe. His Czechoslovakia was a model of ethnic coexistence and liberal democracy, annihilated by the Munich Agreement in 1938."}
+  },
+  { id:40, flag:'🇨🇿', country:'Tchéquie', countryEn:'Czech Republic',
+    name:'Václav Havel', dates:'1936–2011', period:'1989–2003',
+    role:{fr:'Président de la République', en:'President of the Republic'},
+    tags:['Démocrate','Dissident','Réformateur'],
+    wiki:'Václav_Havel',
+    bio:{fr:"Dramaturge dissident devenu chef d'État, Havel mena la Révolution de Velours en 1989 qui mit fin pacifiquement au communisme tchécoslovaque. Il présida ensuite la séparation pacifique de la Tchécoslovaquie et l'intégration européenne.", en:"Playwright-turned-dissident-turned-statesman, Havel led the Velvet Revolution of 1989 which peacefully ended Czechoslovak communism. He then oversaw the peaceful separation of Czechoslovakia and European integration."},
+    legacy:{fr:"Symbole mondial de la résistance morale au totalitarisme et des révolutions pacifiques de 1989. Sa pensée sur le « pouvoir des sans-pouvoir » reste une référence universelle.", en:"A global symbol of moral resistance to totalitarianism and the peaceful revolutions of 1989. His thinking on 'the power of the powerless' remains a universal reference."}
+  },
+  // ROUMANIE
+  { id:41, flag:'🇷🇴', country:'Roumanie', countryEn:'Romania',
+    name:'Nicolae Ceaușescu', dates:'1918–1989', period:'1965–1989',
+    role:{fr:'Secrétaire général / Président', en:'General Secretary / President'},
+    tags:['Autoritaire','Communiste','Totalitaire'],
+    wiki:'Nicolae_Ceaușescu',
+    bio:{fr:"Dictateur roumain pendant 24 ans, Ceaușescu instaura l'un des régimes communistes les plus répressifs d'Europe, tout en affichant une indépendance vis-à-vis de Moscou. Il fut renversé et exécuté lors de la révolution de décembre 1989.", en:"Romanian dictator for 24 years, Ceaușescu established one of Europe's most repressive communist regimes, while displaying independence from Moscow. He was overthrown and executed during the December 1989 revolution."},
+    legacy:{fr:"Son régime, marqué par la misère organisée et la Securitate, reste un symbole d'horreur totalitaire. Son exécution télévisée le jour de Noël 1989 marqua la fin du communisme européen.", en:"His regime, marked by organised poverty and the Securitate, remains a symbol of totalitarian horror. His televised execution on Christmas Day 1989 marked the end of European communism."}
+  },
+  // JEAN MONNET
+  { id:42, flag:'🇫🇷', country:'France', countryEn:'France',
+    name:'Jean Monnet', dates:'1888–1979', period:'1950–1975',
+    role:{fr:'Père de l\'Europe', en:'Father of Europe'},
+    tags:['Europe','Fondateur','Réformateur'],
+    wiki:'Jean_Monnet',
+    bio:{fr:"Entrepreneur et diplomate français, Monnet conçut le Plan Schuman (1950) qui donna naissance à la CECA, ancêtre de l'Union européenne. Il fut le premier président de la Haute Autorité de la CECA et fonda le Comité d'action pour les États-Unis d'Europe.", en:"French businessman and diplomat, Monnet conceived the Schuman Plan (1950) which gave birth to the ECSC, forerunner of the European Union. He was the first President of the ECSC High Authority and founded the Action Committee for the United States of Europe."},
+    legacy:{fr:"Père fondateur de l'Union européenne, son modèle d'intégration progressive et fonctionnelle est le fondement de la construction européenne telle qu'elle existe aujourd'hui.", en:"Founding father of the European Union, his model of gradual, functional integration is the foundation of the European project as it exists today."}
+  }
+];
+
+// ────────────────────────────────────────────────
+// STATE
+// ────────────────────────────────────────────────
+let lang = 'fr';
+let activeTab = 'liste';
+let activeFilter = 'Tous';
+let portraitCache = {};
+
+// Quiz state
+let quizQuestions = [];
+let quizIndex = 0;
+let quizScore = 0;
+let quizAnswered = false;
+
+// ────────────────────────────────────────────────
+// TRANSLATIONS
+// ────────────────────────────────────────────────
+const T = {
+  fr: {
+    title: 'Leaders Européens',
+    subtitle: 'XXe Siècle · 42 figures',
+    figures: 'Figures',
+    quiz: 'Quiz',
+    filters: ['Tous','France','Royaume-Uni','Allemagne','Italie','Espagne','URSS / Russie','Autres'],
+    filterKeys: ['Tous','France','Royaume-Uni','Allemagne','Italie','Espagne','Russie / URSS','AUTRE'],
+    bio: 'Biographie',
+    legacy: 'Héritage',
+    tags: 'Catégories',
+    score: 'Score',
+    nextQ: 'Question suivante →',
+    restart: 'Recommencer',
+    quizDone: 'Quiz terminé',
+    qTypes: [
+      (l) => `Quelle est la nationalité de ${l.name} ?`,
+      (l) => `${l.name} a exercé le pouvoir de :`,
+      (l) => `Quel rôle a occupé ${l.name} ?`,
+      (l) => `À quel pays appartient ce leader ?`,
+      (l) => `Qui est ce leader européen ?`,
+    ]
+  },
+  en: {
+    title: 'European Leaders',
+    subtitle: '20th Century · 42 figures',
+    figures: 'Figures',
+    quiz: 'Quiz',
+    filters: ['All','France','United Kingdom','Germany','Italy','Spain','USSR / Russia','Others'],
+    filterKeys: ['Tous','France','Royaume-Uni','Allemagne','Italie','Espagne','Russie / URSS','AUTRE'],
+    bio: 'Biography',
+    legacy: 'Legacy',
+    tags: 'Categories',
+    score: 'Score',
+    nextQ: 'Next question →',
+    restart: 'Restart',
+    quizDone: 'Quiz completed',
+    qTypes: [
+      (l) => `What is the nationality of ${l.name}?`,
+      (l) => `${l.name} held power from:`,
+      (l) => `What role did ${l.name} hold?`,
+      (l) => `Which country does this leader belong to?`,
+      (l) => `Who is this European leader?`,
+    ]
+  }
+};
+
+// ────────────────────────────────────────────────
+// LANG
+// ────────────────────────────────────────────────
+function setLang(l) {
+  lang = l;
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent === l.toUpperCase());
+  });
+  const t = T[lang];
+  document.getElementById('h-title').textContent = t.title;
+  document.getElementById('h-subtitle').textContent = t.subtitle;
+  document.getElementById('t-liste').textContent = t.figures;
+  document.getElementById('tab-btn-quiz').textContent = t.quiz;
+  renderFilters();
+  renderListe();
+  if (activeTab === 'quiz') renderQuiz();
+  if (activeTab === 'apps') renderApps();
+}
+
+// ────────────────────────────────────────────────
+// TABS
+// ────────────────────────────────────────────────
+function showTab(tab) {
+  activeTab = tab;
+  document.getElementById('tab-liste').classList.toggle('hidden', tab !== 'liste');
+  document.getElementById('tab-quiz').classList.toggle('hidden', tab !== 'quiz');
+  document.getElementById('tab-apps').classList.toggle('hidden', tab !== 'apps');
+  document.getElementById('filters-wrap').classList.toggle('hidden', tab !== 'liste');
+  document.getElementById('tab-btn-liste').classList.toggle('active', tab === 'liste');
+  document.getElementById('tab-btn-quiz').classList.toggle('active', tab === 'quiz');
+  document.getElementById('tab-btn-apps').classList.toggle('active', tab === 'apps');
+  if (tab === 'quiz') initQuiz();
+  if (tab === 'apps') renderApps();
+}
+
+// ────────────────────────────────────────────────
+// FILTERS
+// ────────────────────────────────────────────────
+const mainCountries = ['France','Royaume-Uni','Allemagne','Italie','Espagne','Russie / URSS'];
+
+function getFilteredData() {
+  if (activeFilter === 'Tous' || activeFilter === 'All') return DATA;
+  const t = T[lang];
+  const idx = t.filters.indexOf(activeFilter);
+  if (idx <= 0) return DATA;
+  const key = t.filterKeys[idx];
+  if (key === 'AUTRE') return DATA.filter(l => !mainCountries.includes(l.country));
+  return DATA.filter(l => l.country === key);
+}
+
+function renderFilters() {
+  const t = T[lang];
+  const container = document.getElementById('filters-container');
+  container.innerHTML = '';
+  t.filters.forEach(f => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn' + (f === activeFilter ? ' active' : '');
+    btn.textContent = f;
+    btn.onclick = () => {
+      activeFilter = f;
+      renderFilters();
+      renderListe();
+    };
+    container.appendChild(btn);
+  });
+}
+
+// ────────────────────────────────────────────────
+// LISTE
+// ────────────────────────────────────────────────
+function renderListe() {
+  const container = document.getElementById('tab-liste');
+  const filtered = getFilteredData();
+  container.innerHTML = '';
+  filtered.forEach(leader => {
+    const card = document.createElement('div');
+    card.className = 'leader-card';
+    card.onclick = () => openDetail(leader);
+
+    const portraitEl = document.createElement('div');
+    portraitEl.className = 'leader-portrait';
+    portraitEl.dataset.lid = leader.id;
+    loadPortrait(leader, portraitEl, 52);
+
+    const info = document.createElement('div');
+    info.className = 'leader-info';
+    info.innerHTML = `
+      <div class="leader-name">${leader.name}</div>
+      <div class="leader-role">${leader.role[lang]}</div>
+      <div class="leader-dates">${leader.period}</div>
+    `;
+
+    const flag = document.createElement('div');
+    flag.className = 'leader-flag';
+    flag.textContent = leader.flag;
+
+    card.appendChild(portraitEl);
+    card.appendChild(info);
+    card.appendChild(flag);
+    container.appendChild(card);
+  });
+}
+
+// ────────────────────────────────────────────────
+// PORTRAIT LOADER (Wikipedia — double stratégie)
+// ────────────────────────────────────────────────
+function loadPortrait(leader, container, size) {
+  if (portraitCache[leader.id]) {
+    applyPortrait(container, portraitCache[leader.id]);
+    return;
+  }
+  container.textContent = leader.flag;
+
+  // Stratégie 1 : REST v1 summary (thumbnail direct)
+  const restUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(leader.wiki)}`;
+  fetch(restUrl, { headers: { 'Accept': 'application/json' } })
+    .then(r => r.ok ? r.json() : Promise.reject())
+    .then(data => {
+      const url = data.thumbnail?.source;
+      if (url) { cacheAndShow(leader.id, url, container); }
+      else { fallbackPageImages(leader, container, size); }
+    })
+    .catch(() => fallbackPageImages(leader, container, size));
+}
+
+// Stratégie 2 : action=query&prop=pageimages (piwikis, plus large)
+function fallbackPageImages(leader, container, size) {
+  const pxSize = size >= 100 ? 300 : 100;
+  const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(leader.wiki)}&prop=pageimages&pithumbsize=${pxSize}&format=json&origin=*`;
+  fetch(url)
+    .then(r => r.json())
+    .then(data => {
+      const pages = data.query?.pages;
+      if (!pages) return;
+      const page = Object.values(pages)[0];
+      const imgUrl = page?.thumbnail?.source;
+      if (imgUrl) cacheAndShow(leader.id, imgUrl, container);
+    })
+    .catch(() => {});
+}
+
+function cacheAndShow(id, url, container) {
+  portraitCache[id] = url;
+  applyPortrait(container, url);
+}
+
+function applyPortrait(container, url) {
+  const img = new Image();
+  img.onload = () => {
+    container.innerHTML = '';
+    img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%';
+    container.appendChild(img);
+  };
+  img.onerror = () => {}; // garde le flag emoji
+  img.src = url;
+}
+
+// ────────────────────────────────────────────────
+// DETAIL
+// ────────────────────────────────────────────────
+function openDetail(leader) {
+  document.getElementById('detail-header-name').textContent = leader.name;
+  document.getElementById('detail-flag').textContent = leader.flag;
+  document.getElementById('detail-name').textContent = leader.name;
+  document.getElementById('detail-role').textContent = leader.role[lang];
+  document.getElementById('detail-dates').textContent = `${leader.period}  ·  ${leader.dates}`;
+  document.getElementById('detail-bio').textContent = leader.bio[lang];
+  document.getElementById('detail-legacy').textContent = leader.legacy[lang];
+  document.getElementById('ds-bio').textContent = T[lang].bio;
+  document.getElementById('ds-legacy').textContent = T[lang].legacy;
+  document.getElementById('ds-tags').textContent = T[lang].tags;
+
+  const tagsEl = document.getElementById('detail-tags');
+  tagsEl.innerHTML = '';
+  leader.tags.forEach(tag => {
+    const badge = document.createElement('span');
+    badge.className = 'detail-badge';
+    badge.textContent = tag;
+    tagsEl.appendChild(badge);
+  });
+
+  const portraitBig = document.getElementById('detail-portrait-big');
+  portraitBig.innerHTML = '';
+  portraitBig.textContent = leader.flag;
+  portraitBig.dataset.lid = leader.id;
+  loadPortrait(leader, portraitBig, 110);
+
+  document.getElementById('panel-detail').classList.add('open');
+}
+
+function closeDetail() {
+  document.getElementById('panel-detail').classList.remove('open');
+}
+
+// ────────────────────────────────────────────────
+// QUIZ
+// ────────────────────────────────────────────────
+function initQuiz() {
+  quizQuestions = buildQuizQuestions();
+  quizIndex = 0;
+  quizScore = 0;
+  quizAnswered = false;
+  renderQuiz();
+}
+
+function buildQuizQuestions() {
+  const shuffled = [...DATA].sort(() => Math.random() - 0.5).slice(0, 10);
+  return shuffled.map(leader => {
+    const qTypeIdx = Math.floor(Math.random() * 4);
+    let question, correctAnswer, wrongAnswers;
+
+    if (qTypeIdx === 0) {
+      // Nationality
+      question = T[lang].qTypes[0](leader);
+      correctAnswer = lang === 'fr' ? leader.country : leader.countryEn;
+      wrongAnswers = DATA.filter(l => l.id !== leader.id)
+        .sort(() => Math.random() - 0.5).slice(0,3)
+        .map(l => lang === 'fr' ? l.country : l.countryEn);
+    } else if (qTypeIdx === 1) {
+      // Period
+      question = T[lang].qTypes[1](leader);
+      correctAnswer = leader.period;
+      const fakePeriods = ['1910–1925','1930–1940','1950–1960','1970–1985','1945–1952','1960–1969'];
+      wrongAnswers = fakePeriods.filter(p => p !== leader.period).sort(() => Math.random()-0.5).slice(0,3);
+    } else if (qTypeIdx === 2) {
+      // Role
+      question = T[lang].qTypes[2](leader);
+      correctAnswer = leader.role[lang];
+      wrongAnswers = DATA.filter(l => l.id !== leader.id)
+        .sort(() => Math.random()-0.5).slice(0,3)
+        .map(l => l.role[lang]);
+    } else {
+      // Who is this? (with portrait)
+      question = T[lang].qTypes[4](leader);
+      correctAnswer = leader.name;
+      wrongAnswers = DATA.filter(l => l.id !== leader.id)
+        .sort(() => Math.random()-0.5).slice(0,3)
+        .map(l => l.name);
+    }
+
+    // Deduplicate & shuffle answers
+    const uniqueWrong = [...new Set(wrongAnswers)].filter(w => w !== correctAnswer).slice(0,3);
+    while (uniqueWrong.length < 3) uniqueWrong.push('—');
+    const answers = [...uniqueWrong, correctAnswer].sort(() => Math.random()-0.5);
+
+    return { leader, question, correctAnswer, answers, qTypeIdx };
+  });
+}
+
+function renderQuiz() {
+  const container = document.getElementById('tab-quiz');
+  container.innerHTML = '';
+
+  const t = T[lang];
+
+  // Score bar
+  const scoreBar = document.createElement('div');
+  scoreBar.className = 'quiz-score-bar';
+  scoreBar.innerHTML = `
+    <span class="quiz-score-label">${t.score}</span>
+    <span class="quiz-score-value">${quizScore} / ${quizQuestions.length}</span>
+  `;
+  container.appendChild(scoreBar);
+
+  if (quizIndex >= quizQuestions.length) {
+    // Result
+    const resultBox = document.createElement('div');
+    resultBox.className = 'quiz-result-box';
+    const pct = Math.round(quizScore / quizQuestions.length * 100);
+    const emoji = pct >= 80 ? '🏆' : pct >= 50 ? '👍' : '📚';
+    resultBox.innerHTML = `
+      <div class="quiz-result-score">${emoji} ${quizScore}/${quizQuestions.length}</div>
+      <div class="quiz-result-label">${t.quizDone}</div>
+      <button class="quiz-restart-btn" onclick="initQuiz()">${t.restart}</button>
+    `;
+    container.appendChild(resultBox);
+    return;
+  }
+
+  const q = quizQuestions[quizIndex];
+
+  // Question box
+  const qBox = document.createElement('div');
+  qBox.className = 'quiz-question-box';
+
+  const portraitEl = document.createElement('div');
+  portraitEl.className = 'quiz-q-portrait';
+  portraitEl.dataset.lid = q.leader.id;
+  portraitEl.textContent = q.leader.flag;
+  loadPortrait(q.leader, portraitEl, 80);
+  qBox.appendChild(portraitEl);
+
+  const qText = document.createElement('div');
+  qText.className = 'quiz-question-text';
+  qText.textContent = q.question;
+  qBox.appendChild(qText);
+  container.appendChild(qBox);
+
+  // Answers
+  const answersEl = document.createElement('div');
+  answersEl.className = 'quiz-answers';
+  q.answers.forEach(answer => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-answer-btn';
+    btn.textContent = answer;
+    btn.onclick = () => {
+      if (quizAnswered) return;
+      quizAnswered = true;
+      const correct = answer === q.correctAnswer;
+      if (correct) { quizScore++; btn.classList.add('correct'); }
+      else { btn.classList.add('wrong'); }
+      // Show correct answer
+      answersEl.querySelectorAll('.quiz-answer-btn').forEach(b => {
+        if (b.textContent === q.correctAnswer) b.classList.add('correct');
+        b.disabled = true;
+      });
+      // Update score
+      scoreBar.querySelector('.quiz-score-value').textContent = `${quizScore} / ${quizQuestions.length}`;
+      nextBtn.style.display = 'block';
+    };
+    answersEl.appendChild(btn);
+  });
+  container.appendChild(answersEl);
+
+  // Next button
+  const nextBtn = document.createElement('button');
+  nextBtn.className = 'quiz-next-btn';
+  nextBtn.textContent = quizIndex < quizQuestions.length - 1 ? t.nextQ : t.restart;
+  nextBtn.style.display = 'none';
+  nextBtn.onclick = () => {
+    quizIndex++;
+    quizAnswered = false;
+    if (quizIndex >= quizQuestions.length) renderQuiz();
+    else { renderQuiz(); }
+  };
+  container.appendChild(nextBtn);
+}
+
+
+// ────────────────────────────────────────────────
+// NOS APPS
+// ────────────────────────────────────────────────
+const MES_APPS = [
+  { name: 'Rois de France',            desc: {fr:'44 monarques · dynasties · quiz', en:'44 monarchs · dynasties · quiz'},       icon: '👑', id: 'id6761323546' },
+  { name: 'Présidents de la République', desc: {fr:'25 présidents · République · quiz', en:'25 presidents · Republic · quiz'},  icon: '🇫🇷', id: 'id6761424444' },
+  { name: 'Académie française',        desc: {fr:'5 académies · 100 membres · quiz', en:'5 academies · 100 members · quiz'},     icon: '⚜️', id: 'id6761334922' },
+  { name: 'Théâtres Paris',            desc: {fr:'Salles & spectacles parisiens', en:'Parisian theatres & shows'},               icon: '🎭', id: 'id6760929391' },
+  { name: 'Scènes Paris',              desc: {fr:'Scènes culturelles de Paris', en:'Cultural venues of Paris'},                  icon: '🎪', id: 'id6761293938' },
+  { name: 'Musées de Paris',           desc: {fr:'Les musées incontournables', en:'Essential Paris museums'},                    icon: '🏛️', id: 'id6760890465' },
+  { name: 'Cimetières Paris',          desc: {fr:'Personnalités & histoire', en:'Personalities & history'},                     icon: '🕊️', id: 'id6760751055' },
+  { name: 'MesRestaurants',            desc: {fr:'Carnet de restaurants personnel', en:'Personal restaurant notebook'},          icon: '🍽️', id: 'id6760617965' },
+  { name: 'Frigo Manager',             desc: {fr:'Gérez votre réfrigérateur', en:'Manage your fridge'},                         icon: '🧊', id: 'id6759219383' },
+  { name: 'Cave Manager',              desc: {fr:'Cave à vin personnelle', en:'Personal wine cellar'},                           icon: '🍷', id: 'id6760126279' },
+  { name: 'MediSafe-Pharmacie',        desc: {fr:'Suivi de vos médicaments', en:'Track your medications'},                      icon: '💊', id: 'id6761271324' },
+];
+
+function renderApps() {
+  const container = document.getElementById('tab-apps');
+  container.innerHTML = '';
+
+  const intro = document.createElement('div');
+  intro.className = 'apps-intro';
+  intro.textContent = lang === 'fr' ? 'Nos autres applications' : 'Our other applications';
+  container.appendChild(intro);
+
+  MES_APPS.forEach(app => {
+    const item = document.createElement('div');
+    item.className = 'app-item';
+    item.onclick = () => {
+      const url = 'https://apps.apple.com/app/' + app.id;
+      window.open(url, '_system');
+    };
+
+    const iconEl = document.createElement('div');
+    iconEl.className = 'app-icon';
+    // Tenter de charger l'icône depuis iTunes API
+    const itunes = `https://itunes.apple.com/lookup?id=${app.id.replace('id','')}&country=fr`;
+    fetch(itunes)
+      .then(r => r.json())
+      .then(d => {
+        const artwork = d.results && d.results[0] && d.results[0].artworkUrl100;
+        if (artwork) {
+          const img = document.createElement('img');
+          img.src = artwork;
+          iconEl.innerHTML = '';
+          iconEl.appendChild(img);
+        }
+      })
+      .catch(() => {});
+    iconEl.textContent = app.icon;
+
+    const infoEl = document.createElement('div');
+    infoEl.className = 'app-info';
+    infoEl.innerHTML = `
+      <div class="app-name">${app.name}</div>
+      <div class="app-desc">${app.desc[lang]}</div>
+    `;
+
+    const chevron = document.createElement('div');
+    chevron.className = 'app-chevron';
+    chevron.textContent = '›';
+
+    item.appendChild(iconEl);
+    item.appendChild(infoEl);
+    item.appendChild(chevron);
+    container.appendChild(item);
+  });
+}
+
+// ────────────────────────────────────────────────
+// INIT
+// ────────────────────────────────────────────────
+renderFilters();
+renderListe();
+
+// Préchargement arrière-plan de tous les portraits
+function preloadAllPortraits() {
+  DATA.forEach((leader, i) => {
+    setTimeout(() => {
+      if (portraitCache[leader.id]) return;
+      const restUrl = 'https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(leader.wiki);
+      fetch(restUrl, { headers: { 'Accept': 'application/json' } })
+        .then(r => r.ok ? r.json() : Promise.reject())
+        .then(data => {
+          const url = data.thumbnail && data.thumbnail.source;
+          if (url) { portraitCache[leader.id] = url; refreshPortraitContainers(leader.id, url); }
+          else { fallbackPageImages(leader, null, 120); }
+        })
+        .catch(() => { fallbackPageImages(leader, null, 120); });
+    }, i * 150);
+  });
+}
+
+function refreshPortraitContainers(id, url) {
+  document.querySelectorAll('[data-lid="' + id + '"]').forEach(el => applyPortrait(el, url));
+}
+
+setTimeout(preloadAllPortraits, 400);
+</script>
+</body>
+</html>
